@@ -1,0 +1,4 @@
+# Skills to exclude from syncing to ~/.claude/skills/
+# One skill folder name per line
+# Lines starting with # are comments
+sync-skills
