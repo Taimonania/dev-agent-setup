@@ -49,16 +49,32 @@ The module is the enforceable boundary — enforce it with the language's privac
 import lint rules where the language has none. A folder where everything is exported is not a
 boundary.
 
-A slice folder contains, together:
+A slice folder holds these **concerns**, in as few files as they fit into:
+
+| Concern | Own file? |
+|---|---|
+| The event types this slice appends | **Yes.** A published, append-only contract other slices depend on. Easiest to contract-test standing alone. |
+| The handler — composition only, no logic (see IOSP) | Yes. Something must be the door. |
+| The decision — pure `(context model, command) -> events \| rejection` | Split it out when it grows. IOSP is a rule about *functions*; one file can hold both. |
+| The test — given events / when command / then events | Yes, by ecosystem convention. |
+| Input and output shapes | **No.** Put them next to the handler that uses them. |
 
 ```
 orders/place-order/
-  contract.*        input shape, output shape
-  handler.*         composition only — no logic (see IOSP)
-  decide.*          pure: (context model, command) -> events | rejection
   events.*          the event types this slice appends
+  handler.*         entry point, plus its input and output shapes
   handler.test.*    given events / when command / then events
 ```
+
+**File count follows size, not a diagram.** A forty-line slice is one file. Split when it hurts, not
+because a list said five.
+
+Splitting a slice by technical role — contract, handler, decision — is n-tier at miniature scale,
+and it is the same instinct this style exists to reject. In a language whose privacy stops at the
+folder, more files also means more exported symbols, so splitting *weakens* the boundary.
+
+The event is the only real contract: other slices pull from the log and never see your command
+shape.
 
 A query slice additionally owns its read model and projection. A command slice owns none.
 

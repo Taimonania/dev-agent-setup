@@ -26,10 +26,8 @@ Assumes Step 0 of [SKILL.md](./SKILL.md) is done.
   <module>/
     <public entry>          the module's only public surface
     <slice>/                one command or one query
-      contract.*            input shape, output shape
-      handler.*             composition only, no logic
-      decide.*              pure: (context model, command) -> events | rejection
       events.*              the event types this slice appends
+      handler.*             entry point: composition only, plus its input and output shapes
       handler.test.*        given events / when command / then events
   event-log/                append and query, nothing else
 ```
@@ -39,6 +37,14 @@ Rules that must hold, whatever the file extensions are:
 - A slice is **one request** — one command or one query, never both.
 - A slice folder is **self-contained**: deleting it deletes the feature and its tests.
 - A query slice owns its read model and projection. A command slice owns neither.
+- **File count follows size.** The slice must contain its events, its entry point, its decision
+  logic, and its test. Whether that is three files or one is a judgement about length, not a rule.
+  Split the decision out when it grows; do not split by technical role up front — that is n-tier at
+  miniature scale. Where privacy stops at the folder, extra files mean extra exported symbols and a
+  weaker boundary.
+- The **event types get their own file**. They are a published contract other slices depend on, and
+  they are the only thing that crosses the slice boundary. Input and output shapes do not — put
+  them next to the handler.
 - Only the module's entry file is importable from outside the module.
 
 **Done when:** the module exposes exactly one public surface, and slice internals are unreachable
