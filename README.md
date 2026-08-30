@@ -15,9 +15,9 @@ Create a repository from this template, then run:
 /setup
 ```
 
-The `setup` skill takes a new project from empty to ready-to-build in four parts — architecture,
-boundaries, verification, and agent instructions. It detects your language and toolchain first, so
-it works in any stack. Run it once, before the first feature.
+The `setup` skill takes a new project from empty to ready-to-build. It detects your language and
+toolchain first, so it works in any stack, and finishes only once a boundary violation has been
+shown to fail a command. Run it once, before the first feature.
 
 Run `/setup-matt-pocock-skills` as well; it configures the issue tracker and doc layout that six of
 the vendored skills assume. The two do not overlap.

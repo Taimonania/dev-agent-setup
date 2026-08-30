@@ -1,88 +1,84 @@
 ---
 name: setup
-description: Set up a new project from this template — detect the stack, lay down the event-sourced vertical-slice structure, wire boundary enforcement that actually fails, establish the verification command, and write the agent instructions. User-invoked. Run once, before the first feature.
+description: Set up a new project from this template — detect the stack, lay down the event-sourced vertical-slice structure, wire boundary enforcement that actually fails, and establish the verification command. User-invoked. Run once, before the first feature.
 user-invocable: true
 ---
 
 # Setup
 
-Take a new project from empty to ready-to-build. Run this once, near the start, before any feature
-work.
+Turn an empty repo into one ready for its first feature.
 
-Nothing here is language-specific. Every step states *what must be true*; you decide how to make it
-true in this stack.
+**Read `vertical-slices` and `event-orientation` first.** They own the architecture and the reasons
+for it. This skill installs what they describe and does not restate it — when you need to know *why*
+a step is what it is, go there.
 
-Read `event-orientation` and `vertical-slices` before starting. This skill installs the structure
-those two describe.
-
----
-
-## The parts
-
-Work them in order. Each is a separate file in this skill folder; read a part only when you reach
-it.
-
-| Order | Part | Installs |
-|---|---|---|
-| 1 | [architecture.md](./architecture.md) | Module and slice folders, the event log, the first real slice |
-| 2 | [boundaries.md](./boundaries.md) | Enforcement that fails a command when a boundary is crossed |
-| 3 | [verification.md](./verification.md) | The one command that runs everything, and CI |
-| 4 | [agent-instructions.md](./agent-instructions.md) | `AGENTS.md`, `CLAUDE.md`, and the pointers agents follow |
-
-Do not reorder. Boundaries need the shape to exist. Verification needs something to run. The agent
-instructions describe what the first three produced.
+Nothing here names a language. Each step states what must be true; you decide how to make it true.
 
 ---
 
 ## Step 0 — Detect the stack
 
-Before opening any part, establish and state back to the user:
+Establish and state back to the user:
 
-- **Language and package manager** — from the lockfile or manifest already in the repo.
-- **Test runner** — whatever the repo already uses. Do not introduce a second one.
-- **Privacy mechanism** — how this language hides a symbol across a boundary. Java/Kotlin packages,
-  Go's lowercase identifiers and `internal/`, Rust's `pub(crate)`, .NET `internal`, Python `__all__`
-  plus convention, JS/TS `exports` maps or an import linter.
-- **Boundary enforcement tool** — the linter or analyser that can fail a build on a forbidden
-  import. If the language has real privacy, that *is* the tool.
-- **Existing conventions** — if the repo already has a source layout, confirm with the user before
-  putting a different one next to it.
+- **Language, package manager, test runner** — from what the repo already has. Do not add a second
+  test runner.
+- **Privacy mechanism** — how this language hides a symbol across a boundary (Go `internal/`, Rust
+  `pub(crate)`, Java packages, .NET `internal`, an import linter where there is none).
+- **Existing layout** — if the repo already has a source convention, agree with the user before
+  putting a different one beside it.
 
-If the language has **no** enforcement mechanism at all, say so plainly and propose an import-lint
-rule instead. Do not continue with folders alone and call it a boundary.
-
-**Done when:** all five are known and the user has agreed the privacy mechanism.
+If the language has no enforcement mechanism at all, say so and propose an import linter. Do not
+continue with folders alone and call it a boundary.
 
 ---
 
-## The invariant
+## Step 1 — [architecture.md](./architecture.md)
 
-> Modules are enforced boundaries. Slices are folders inside them. The event log is the only thing
-> slices share.
+Modules, slices, the event log, and one real slice.
 
-A folder that merely *looks* like a boundary is decoration. **The completion criterion for this
-skill is that a violation fails a command** — not that the folders exist. `boundaries.md` is where
-that is proven, and it is not optional.
+## Step 2 — [boundaries.md](./boundaries.md)
+
+Enforcement, and proof that it fails when it should.
+
+## Step 3 — Verification
+
+One command runs typecheck, then boundary rules, then tests — in that order, failing fast.
+
+Discover the repo's existing command before adding one; several vendored skills look for the
+project's checks rather than a fixed name. If one exists, extend it. If not, add one and name it
+whatever this ecosystem calls it.
+
+CI must invoke that same command by name, not a reimplementation of it.
+
+## Step 4 — Agent instructions
+
+`AGENTS.md` holds the content; `CLAUDE.md` is the single line `@AGENTS.md`.
+
+**Write no document describing the structure.** The code is the source of truth: the layout is the
+folders, the import rule is the boundary config, the log's operations are its interface, and the
+copy-me example is the real slice from Step 1. A prose copy of an enforced rule can disagree with
+it, and then nobody can tell which is current.
+
+`AGENTS.md` gets a few lines pointing at the example slice, the boundary config, and the
+verification command — artifacts, so a stale pointer breaks loudly. Judgements that no rule catches
+stay in `vertical-slices` and `event-orientation`; do not restate them per project.
 
 ---
 
 ## Not covered here
 
-- **Issue tracker, triage labels, doc layout** — that is `setup-matt-pocock-skills`. Run it too;
-  six of the vendored skills assume it has run. The two skills do not overlap.
-- **Documentation** — do not write any. The code is the source of truth: rules live where they are
-  enforced, and judgements live in the skills. See `agent-instructions.md` 4.1.
-- **CI provider choice, deployment, infrastructure** — out of scope. `verification.md` defines the
-  command CI should run; picking the provider is a project decision.
+Issue tracker, triage labels, and doc layout are `setup-matt-pocock-skills` — run it too. CI
+provider, deployment, and infrastructure are project decisions.
 
 ---
 
 ## Done when
 
-- The shape exists and one real slice passes its own test with no mocks.
-- Each boundary rule has been observed to pass, then fail on a deliberate violation, then pass again.
-- One command runs typecheck, tests, and boundaries together.
-- `AGENTS.md` exists, is short, and every pointer in it resolves to a real path.
+Report each with the command output that proves it:
 
-Report each of these with the command output that proves it. Do not report setup as complete on the
-strength of the folders existing.
+- One real slice passes its own test, using the in-memory log, with no mocks.
+- Each boundary rule was observed to pass, fail on a deliberate violation, then pass again.
+- One command runs typecheck, boundaries, and tests together.
+- `AGENTS.md` is short and every pointer in it resolves.
+
+Folders existing is not evidence. Do not report setup complete without the output.

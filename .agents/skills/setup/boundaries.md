@@ -1,69 +1,55 @@
-# Part 2 — Boundaries
+# Step 2 — Boundaries
 
-Make the structure from [architecture.md](./architecture.md) enforceable. A folder that merely
-*looks* like a boundary is decoration.
+Make Step 1 enforceable. A folder that merely looks like a boundary is decoration.
 
 ---
 
-## 2.1 Wire enforcement
+## 2.1 Wire the rules
 
-Add a command that fails when a boundary is crossed. It must forbid all four:
+A command that fails when a boundary is crossed. Four rules:
 
-| # | Forbidden | Why |
-|---|---|---|
-| 1 | Importing anything inside a module other than its public entry file | Otherwise the module's internals become everyone's dependency |
-| 2 | Importing one slice from another slice | This is the coupling the style exists to remove |
-| 3 | Dependency cycles | A cycle means the boundary was never real |
-| 4 | Any mutating operation on the event log | AQ-over-CRUD is absolute |
+| # | Forbidden |
+|---|---|
+| 1 | Importing anything inside a module other than its public entry file |
+| 2 | Importing one slice from another slice |
+| 3 | Dependency cycles |
+| 4 | Any mutating operation on the event log |
 
-Use the mechanism found in Step 0. Where the language has real privacy, prefer it — a compiler
-error is cheaper and faster than a linter. Where it does not, an import-lint rule is the fallback.
+Use the mechanism from Step 0. Prefer real language privacy over a linter — a compiler error is
+cheaper and faster.
 
-Write the rules **structurally**, not per module. Adding a second module later must not require a
-config change. If it does, the rules were written as a list of known names instead of a shape.
+Write the rules **structurally**, not per module: adding a second module later must not require a
+config change. If it would, they were written as a list of known names instead of a shape.
 
-Give each rule a message that names what was violated and why it matters — not just "forbidden
-import". The person who trips it is usually not the person who wrote the rule.
+Each rule's message names the failure mode it prevents. This is where the reasoning lives, since
+nothing else in the project will carry it.
+
+Exceptions go in an allowlist, never by loosening a rule — and the allowlist is a **ratchet**:
+entries come out, they do not go in, and a test asserts each remaining one is still needed. An
+exception that quietly became unnecessary is what lets the next real violation through.
 
 **Done when:** the command exists and covers all four.
 
 ---
 
-## 2.2 Prove the rules bite
+## 2.2 Prove they bite
 
-**This is the completion criterion for the whole setup skill.** A rule that cannot fail is
-worthless.
+**This is the completion criterion for setup.** A rule that cannot fail is worthless.
 
-For each of the four rules, in turn:
+For each of the four, in turn:
 
-1. Run the boundary command. It must **pass**.
-2. Add the violation on purpose — a deep import into a module, a slice-to-slice import, a cycle, a
-   delete against the log.
-3. Run again. It must **fail**, and the message must name the rule.
+1. Run the command. It must **pass**.
+2. Add the violation on purpose.
+3. Run again. It must **fail**, naming the rule.
 4. Revert. Run again. It must **pass**.
-
-If any violation does not fail, the rule is not wired up. Fix it before continuing.
 
 ### The silent pass
 
-The most common failure is not a rule that is too loose. It is a rule that matches **nothing** and
-therefore reports success.
+The common failure is not a loose rule. It is a rule that matches **nothing** and reports success —
+usually because the analyser cannot resolve cross-module import paths, so it never sees what it was
+meant to reject. Everything is green forever, whatever anyone writes.
 
-Usual cause: the analyser cannot resolve cross-module import paths, so it never sees the imports it
-was supposed to reject. Everything is green, forever, no matter what anyone writes.
+Confirm the tool actually resolved the imports it rejected. A green check that can never go red
+tells you nothing.
 
-This is why step 2 above is not optional. A green check that can never go red tells you nothing.
-Confirm the tool actually resolved the imports it rejected.
-
-### Exceptions
-
-If a rule needs an exception, add it to an explicit allowlist rather than loosening the rule.
-
-Then make the allowlist a **ratchet**: entries may be removed but never added without a deliberate
-decision, and a test asserts that every entry is still necessary. An exception that has quietly
-become unnecessary is the one that lets the next real violation through.
-
-**Done when:** you have observed pass → fail → pass for **each** of the four rules, and have shown
-the user the failing output.
-
-Next: [verification.md](./verification.md).
+**Done when:** you have shown the user pass → fail → pass for **each** of the four rules.
