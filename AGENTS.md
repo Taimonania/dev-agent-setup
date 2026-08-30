@@ -4,13 +4,14 @@ Template repository for new projects. Stack- and infrastructure-agnostic.
 
 ## Default architecture
 
-New projects start with **event sourcing** and **vertical slices**. Deviating is allowed but is a decision worth recording.
+New projects use **event sourcing** and **vertical slices**.
 
 - Events: append and query only, never update or delete. See the `event-orientation` skill.
 - Slices: one slice per command or query. Minimise coupling between slices. See `vertical-slices`.
 - AQ-over-CRUD is absolute. There is no CRUD slice and no opt-out.
 
-Run `/setup` once at the start of a project to lay this down in the chosen language.
+Starting a project runs three skills in order: `/setup-matt-pocock-skills`, then `/grill-with-docs`
+to decide the stack, then `/setup` to lay the structure down in it. See README.md.
 
 ## Skills
 
@@ -21,6 +22,7 @@ Run `/setup` once at the start of a project to lay this down in the chosen langu
 and are **not** in the lockfile: `setup`, `event-orientation`, `vertical-slices`.
 
 `setup-matt-pocock-skills` is a precondition for the main flow — six skills assume it has run.
+`setup` additionally requires the stack decisions from `grill-with-docs`.
 
 Skills under the upstream `in-progress/` bucket are beta and may change without warning.
 

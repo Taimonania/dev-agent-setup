@@ -8,7 +8,12 @@ user-invocable: true
 
 Turn an empty repo into one ready for its first feature.
 
-**Read `vertical-slices` and `event-orientation` first.** They own the architecture and the reasons
+**Run `/setup-matt-pocock-skills` and `/grill-with-docs` first.** The tech decisions — language,
+runtime, storage — are made during the grilling and recorded there. This skill installs a structure
+in a stack that has already been chosen; it does not choose one. If those decisions do not exist
+yet, stop and go do that instead.
+
+**Read `vertical-slices` and `event-orientation` too.** They own the architecture and the reasons
 for it. This skill installs what they describe and does not restate it — when you need to know *why*
 a step is what it is, go there.
 
@@ -16,19 +21,24 @@ Nothing here names a language. Each step states what must be true; you decide ho
 
 ---
 
-## Step 0 — Detect the stack
+## Step 0 — Establish the stack
 
-Establish and state back to the user:
+Read the decisions recorded by `/grill-with-docs` — the ADRs and glossary — and confirm with the
+user:
 
-- **Language, package manager, test runner** — from what the repo already has. Do not add a second
-  test runner.
+- **Language, package manager, test runner.** In a greenfield repo these are decisions, not
+  detectable facts; there is no lockfile yet. If the repo is not empty, read what is there and do
+  not add a second test runner beside an existing one.
 - **Privacy mechanism** — how this language hides a symbol across a boundary (Go `internal/`, Rust
   `pub(crate)`, Java packages, .NET `internal`, an import linter where there is none).
-- **Existing layout** — if the repo already has a source convention, agree with the user before
-  putting a different one beside it.
+- **Existing layout** — if a source convention already exists, agree with the user before putting a
+  different one beside it.
 
-If the language has no enforcement mechanism at all, say so and propose an import linter. Do not
-continue with folders alone and call it a boundary.
+If no stack decision has been recorded, **stop**. Run `/grill-with-docs` and come back. Guessing a
+language here silently makes the most consequential decision in the project.
+
+If the chosen language has no enforcement mechanism at all, say so and propose an import linter. Do
+not continue with folders alone and call it a boundary.
 
 ---
 
