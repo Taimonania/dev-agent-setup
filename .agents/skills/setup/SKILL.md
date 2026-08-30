@@ -1,7 +1,7 @@
 ---
 name: setup
-description: Set up a new project from this template — detect the stack, lay down the event-sourced vertical-slice structure, wire boundary enforcement that actually fails, and establish the verification command. User-invoked. Run once, before the first feature.
-user-invocable: true
+disable-model-invocation: true
+description: Install the event-sourced vertical-slice structure in a new project — modules and slices, the event log, boundary enforcement that actually fails, and the verification command. Run once, after the stack has been decided and before the first feature.
 ---
 
 # Setup
@@ -62,7 +62,9 @@ CI must invoke that same command by name, not a reimplementation of it.
 
 ## Step 4 — Agent instructions
 
-`AGENTS.md` holds the content; `CLAUDE.md` is the single line `@AGENTS.md`.
+**Replace the template's `AGENTS.md` entirely.** The inherited one describes the template and says
+the project has not been set up yet; both are now false. `CLAUDE.md` stays as the single line
+`@AGENTS.md`.
 
 **Write no document describing the structure.** The code is the source of truth: the layout is the
 folders, the import rule is the boundary config, the log's operations are its interface, and the

@@ -1,32 +1,17 @@
 # AGENTS.md
 
-Template repository for new projects. Stack- and infrastructure-agnostic.
+## Architecture
 
-## Default architecture
+Event sourcing, arranged as vertical slices.
 
-New projects use **event sourcing** and **vertical slices**.
+- Append and query only. No update, no delete. Corrections are new events.
+- One slice per command or query. The event log is the only thing slices share.
+- AQ-over-CRUD is absolute: no CRUD slice, no opt-out.
 
-- Events: append and query only, never update or delete. See the `event-orientation` skill.
-- Slices: one slice per command or query. Minimise coupling between slices. See `vertical-slices`.
-- AQ-over-CRUD is absolute. There is no CRUD slice and no opt-out.
+The `event-orientation` and `vertical-slices` skills carry the rules and the reasoning. Consult them
+before adding a module, a slice, or an event type.
 
-Starting a project runs three skills in order: `/setup-matt-pocock-skills`, then `/grill-with-docs`
-to decide the stack, then `/setup` to lay the structure down in it. See README.md.
+## Before the first feature
 
-## Skills
-
-36 skills live in `.agents/skills/`, surfaced to Claude Code via `.claude/skills/` symlinks. Run
-`/ask-matt` for the map of how the vendored ones compose.
-
-33 are vendored from `mattpocock/skills` and tracked in `skills-lock.json`. Three are authored here
-and are **not** in the lockfile: `setup`, `event-orientation`, `vertical-slices`.
-
-`setup-matt-pocock-skills` is a precondition for the main flow — six skills assume it has run.
-`setup` additionally requires the stack decisions from `grill-with-docs`.
-
-Skills under the upstream `in-progress/` bucket are beta and may change without warning.
-
-## Conventions
-
-- Documentation lives outside this repo; do not scaffold docs here.
-- Research output goes in `docs/research/` as cited Markdown.
+This project has not been set up yet. Run `/setup`, which installs the structure and replaces this
+file with one describing the actual project.
