@@ -70,8 +70,8 @@ that is proven, and it is not optional.
 
 - **Issue tracker, triage labels, doc layout** — that is `setup-matt-pocock-skills`. Run it too;
   six of the vendored skills assume it has run. The two skills do not overlap.
-- **Documentation structure** — documentation lives outside this repo. Do not scaffold `docs/` here
-  beyond the one README that `agent-instructions.md` asks for.
+- **Documentation** — do not write any. The code is the source of truth: rules live where they are
+  enforced, and judgements live in the skills. See `agent-instructions.md` 4.1.
 - **CI provider choice, deployment, infrastructure** — out of scope. `verification.md` defines the
   command CI should run; picking the provider is a project decision.
 
@@ -82,7 +82,7 @@ that is proven, and it is not optional.
 - The shape exists and one real slice passes its own test with no mocks.
 - Each boundary rule has been observed to pass, then fail on a deliberate violation, then pass again.
 - One command runs typecheck, tests, and boundaries together.
-- `AGENTS.md` exists and points at the source README.
+- `AGENTS.md` exists, is short, and every pointer in it resolves to a real path.
 
 Report each of these with the command output that proves it. Do not report setup as complete on the
 strength of the folders existing.
