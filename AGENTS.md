@@ -10,8 +10,7 @@ New projects start with **event sourcing** and **vertical slices**. Deviating is
 - Slices: one slice per command or query. Minimise coupling between slices. See `vertical-slices`.
 - AQ-over-CRUD is absolute. There is no CRUD slice and no opt-out.
 
-Run `/setup-slice-architecture` once at the start of a project to lay this down in the chosen
-language.
+Run `/setup` once at the start of a project to lay this down in the chosen language.
 
 ## Skills
 
@@ -19,7 +18,7 @@ language.
 `/ask-matt` for the map of how the vendored ones compose.
 
 33 are vendored from `mattpocock/skills` and tracked in `skills-lock.json`. Three are authored here
-and are **not** in the lockfile: `event-orientation`, `vertical-slices`, `setup-slice-architecture`.
+and are **not** in the lockfile: `setup`, `event-orientation`, `vertical-slices`.
 
 `setup-matt-pocock-skills` is a precondition for the main flow — six skills assume it has run.
 
