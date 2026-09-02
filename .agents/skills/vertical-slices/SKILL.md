@@ -1,6 +1,6 @@
 ---
 name: vertical-slices
-description: Structure code by request, not by layer. Apply Jimmy Bogard's vertical slice architecture — minimise coupling between slices, maximise coupling within one; a slice per command or query; cross-cutting concerns as wrappers not layers; pure functions as the only shared code. Use when deciding where code goes, adding a feature, reviewing structure, or resisting the pull toward a shared service layer.
+description: Structure code by request, not by layer. Apply Jimmy Bogard's vertical slice architecture — minimise coupling between slices, maximise coupling within one; a slice per command or query; an interaction processor sequences slices without holding logic; cross-cutting concerns as wrappers not layers; pure functions as the only shared code. Use when deciding where code goes, adding a feature, reviewing structure, or resisting the pull toward a shared service layer.
 user-invocable: false
 ---
 
@@ -42,8 +42,10 @@ folder of slices.
 | Level | Unit | Boundary enforced? |
 |---|---|---|
 | **Slice** | one command or one query | No. Discipline only. Duplication is allowed here. |
+| **Interaction** | one user trigger; composes a sequence of slices | No. It is composition, not a boundary. |
 | **Module** | a folder of related slices | **Yes.** One public entry file. Everything else private. |
 | **Context** | deployable / transactional boundary | Yes. Versioned contracts. |
+| **Surface** | adapters: UI in, external resources out | Yes. Nothing above a slice reaches past it. |
 
 The module is the enforceable boundary — enforce it with the language's privacy mechanism, or with
 import lint rules where the language has none. A folder where everything is exported is not a
@@ -58,6 +60,17 @@ A slice folder holds these **concerns**, in as few files as they fit into:
 | The decision — pure `(context model, command) -> events \| rejection` | Split it out when it grows. IOSP is a rule about *functions*; one file can hold both. |
 | The test — given events / when command / then events | Yes, by ecosystem convention. |
 | Input and output shapes | **No.** Put them next to the handler that uses them. |
+
+The default is one file per slice, plus its test. Westphal's own implementation is exactly that:
+"for every command and every query there is a file".
+
+```
+orders/
+  place-order.*         events, handler, decision, input and output shapes
+  place-order.test.*    given events / when command / then events
+```
+
+It grows into a folder only when the single file stops being readable:
 
 ```
 orders/place-order/
@@ -99,14 +112,43 @@ and are thrown away. Read models are queryable derivations of the log.
 
 ---
 
+## The Interaction Above the Slice
+
+One user trigger is often not one slice. "Register a throw" may need a query for context, a command,
+and a second query for the response. Something has to sequence them, and it is not another slice.
+
+That something is a **processor**: an integration module, one per interaction.
+
+> "Commands and queries are integrated by the `Processor` into interactions. It hides the details of
+> composing slices into workflows. To its client it presents a clean interface without any trace of
+> event sourcing." — Westphal
+
+Rules:
+
+- **The processor is pure IOSP integration.** No logic. It calls slices and passes their results on.
+  The moment it decides something, that decision belongs in a slice.
+- **It is not a layer.** Slices never call a processor, and never call each other. Calls go one way:
+  surface → processor → slice → log.
+- **It hides event sourcing from the surface.** The UI sees a request and a response, not events.
+- **A single-slice interaction needs no processor.** Let the surface call the slice.
+- Sequencing several slices is *not* a transaction. Each command appends on its own CCC check; a
+  failure part-way through is a business outcome, corrected by a further event.
+
+The **surface** is everything outside: Westphal's *portals* (UI adapters, which collect input and
+project the response) and *providers* (adapters for external resources). This is where dependency
+inversion is allowed — clock, network, store, randomness — and nowhere else.
+
+---
+
 ## What Slices May Share
 
-Exactly two things, and nothing else.
+Three things, and nothing else.
 
 | Shared | Allowed? | Why |
 |---|---|---|
 | **The event log** | Yes — by design | Westphal's "least common denominator: very simple and small differences in state". Each slice projects it into its own model. |
 | **Pure domain functions** | Yes, on the third occurrence | No I/O, no state, no side effects. |
+| **Transient data passed along a flow** | Yes, within one interaction | Westphal: slices share "no stateful data structures", but do share "small data structures in the flow to be handed downstream". The processor owns the shape; it is never persisted and never a shared type library. |
 | A shared service / manager / helper class | No | It becomes the new god-layer. |
 | A shared ORM context, repository, or data-access layer | No | The horizontal layer, reintroduced. |
 | A shared "domain model" object graph | No | See `event-orientation` — kill the entity. |
@@ -240,6 +282,7 @@ Rules:
 | Inconsistency | Every slice solves the same problem differently | One canonical slice template; new slices copy it. |
 | The new god-layer | A "shared" module accumulates unrelated callers | Any shared module with a second unrelated caller gets split. |
 | God slice | One slice handles several requests, hundreds of lines | One request per slice. Two requests means two slices. |
+| Fat processor | An interaction module grows branching, rules, or state | Processors integrate only. Any decision moves into a slice. |
 | Fake boundaries | Everything exported; folders are decoration | Module-level privacy or import lint rules. |
 | Event schema drift | A slice "owns" its event and edits it freely | Events are append-only published contracts. Add new types; never change meaning. |
 | Ambient reaction | Slices react to each other's events implicitly; flow untraceable | Reactions are explicit slices with named triggers. |
@@ -248,7 +291,8 @@ Rules:
 
 ## Checklist for a New Slice
 
-1. **One request?** If it handles two, it is two slices.
+1. **One request?** If it handles two, it is two slices. If the user trigger genuinely needs both,
+   the slices stay separate and a processor sequences them.
 2. **Command or query?** Never both. Commands change state and return nothing meaningful; queries
    return data and change nothing.
 3. **Which module?** Put it next to the slices it shares a business concept with — not next to the
