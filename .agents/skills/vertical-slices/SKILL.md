@@ -1,6 +1,6 @@
 ---
 name: vertical-slices
-description: Structure code by request, not by layer. Apply Jimmy Bogard's vertical slice architecture — minimise coupling between slices, maximise coupling within one; a slice per command or query; an interaction processor sequences slices without holding logic; cross-cutting concerns as wrappers not layers; pure functions as the only shared code. Use when deciding where code goes, adding a feature, reviewing structure, or resisting the pull toward a shared service layer.
+description: Use when deciding where new code goes, wiring a user trigger that needs several slices, judging what two slices may share, reviewing whether existing structure still cuts by request, or when a shared service, helper, or layer is about to appear.
 user-invocable: false
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: event-orientation
-description: Apply Ralf Westphal's event-orientation principles — AQ over CRUD, when to record events, scoping events with event-to-event references, killing entity thinking, and Command Context Consistency. Use when designing event stores, reasoning about what to record, structuring event relationships, or ensuring consistency without aggregates.
+description: Use when deciding what to record as an event, scoping or naming an event type, working out what a command must check before it appends, or when an update, delete, entity, or aggregate is about to appear.
 user-invocable: false
 ---
 
