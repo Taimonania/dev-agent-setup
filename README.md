@@ -38,7 +38,13 @@ repeating it.
 
 Skills are in `.agents/skills/`, symlinked into `.claude/skills/`. Those vendored from
 [mattpocock/skills](https://github.com/mattpocock/skills) are tracked in `skills-lock.json`; `setup`,
-`event-orientation`, and `vertical-slices` are authored here and are not.
+`event-orientation`, `vertical-slices`, and `visual-review` are authored here and are not.
+
+`visual-review` is automatically discoverable after user-facing UI changes, and can also be
+invoked with `/visual-review`. It checks the running UI against acceptance criteria and broader
+usability, with screenshots and optional videos as evidence. It uses an installed `agent-browser`
+CLI by default and Playwright CLI for deeper debugging or as a fallback; consult the installed
+browser skills/help for setup and usage. These browser tools are not bundled in this template.
 
 `docs/research/` is the cited research behind these decisions. It is template history, not project
 material — **delete it in a project built from this template.**
